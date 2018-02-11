@@ -191,7 +191,7 @@
 
             // TODO: only write changes
             dom.time.innerHTML = getTime(this.position, true);
-
+            dom.duration.innerHTML = getTime(this.durationEstimate, true);
           }
 
           callback('whileplaying', this);
@@ -1034,9 +1034,18 @@
 
       stop: function() {
 
-        // just an alias for pause, really.
-        // don't actually stop because that will mess up some UI state, i.e., dragging the slider.
-        return actions.pause();
+        // stopping means to remove the soundObject entirely
+        // doing so allows to play live web streams such as from icecast
+
+        if (soundObject) {
+          soundObject.stop();
+          soundObject.unload();
+          soundObject = soundObject.destruct();
+          utils.css.remove(dom.o, 'playing');
+          dom.progress.style.left = '0%';
+          dom.time.innerHTML = getTime(0, true);
+          dom.duration.innerHTML = getTime(0, true);
+        }
 
       },
 
